@@ -11,6 +11,7 @@ class TransFilesAppAlternative {
         
         this.textInput = document.getElementById('textInput');
         this.sendTextBtn = document.getElementById('sendText');
+        this.languageSelect = document.getElementById('languageSelect');
         
         this.fileDropZone = document.getElementById('fileDropZone');
         this.fileInput = document.getElementById('fileInput');
@@ -89,6 +90,9 @@ class TransFilesAppAlternative {
             return;
         }
         
+        // Vider le contenu reçu lors du changement de room
+        this.clearReceivedContent();
+        
         this.currentRoom = id;
         this.setupRoomListener();
         this.updateRoomStatus(true);
@@ -129,6 +133,7 @@ class TransFilesAppAlternative {
         const textData = {
             type: 'text',
             content: text,
+            language: this.languageSelect.value,
             timestamp: Date.now(),
             sender: 'Vous'
         };
@@ -246,6 +251,17 @@ class TransFilesAppAlternative {
     
     // === AFFICHAGE DU CONTENU REÇU ===
     
+    // Vider le contenu reçu
+    clearReceivedContent() {
+        this.receivedContent.innerHTML = `
+            <div class="empty-state">
+                <span class="empty-icon">📭</span>
+                <p>En attente de contenu...</p>
+                <p><small>Room ${this.currentRoom || 'nouvelle'}</small></p>
+            </div>
+        `;
+    }
+    
     // Afficher le contenu reçu
     displayReceivedContent(data) {
         // Supprimer l'état vide s'il existe
@@ -277,13 +293,17 @@ class TransFilesAppAlternative {
         const timestamp = new Date(data.timestamp).toLocaleString('fr-FR');
         
         if (data.type === 'text') {
+            const language = data.language || 'text';
+            const languageLabel = this.getLanguageLabel(language);
+            const languageIcon = this.getLanguageIcon(language);
+            
             item.innerHTML = `
                 <div class="item-header">
-                    <span class="item-type">📝 Texte</span>
+                    <span class="item-type">${languageIcon} ${languageLabel}</span>
                     <span class="item-timestamp">${timestamp}</span>
                 </div>
                 <div class="item-content">
-                    <pre>${this.escapeHtml(data.content)}</pre>
+                    <pre class="language-${language}">${this.escapeHtml(data.content)}</pre>
                 </div>
                 <div class="item-actions">
                     <button class="action-btn copy" onclick="app.copyToClipboard('${this.escapeHtml(data.content)}')">
@@ -367,6 +387,52 @@ class TransFilesAppAlternative {
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Obtenir le label de la langue
+    getLanguageLabel(language) {
+        const labels = {
+            'text': 'Texte',
+            'javascript': 'JavaScript',
+            'java': 'Java',
+            'python': 'Python',
+            'html': 'HTML',
+            'css': 'CSS',
+            'sql': 'SQL',
+            'json': 'JSON',
+            'xml': 'XML',
+            'bash': 'Bash/Shell',
+            'cpp': 'C++',
+            'csharp': 'C#',
+            'php': 'PHP',
+            'ruby': 'Ruby',
+            'go': 'Go',
+            'rust': 'Rust'
+        };
+        return labels[language] || 'Texte';
+    }
+    
+    // Obtenir l'icône de la langue
+    getLanguageIcon(language) {
+        const icons = {
+            'text': '📝',
+            'javascript': '🟨',
+            'java': '☕',
+            'python': '🐍',
+            'html': '🌐',
+            'css': '🎨',
+            'sql': '🗄️',
+            'json': '📋',
+            'xml': '📄',
+            'bash': '💻',
+            'cpp': '⚡',
+            'csharp': '🔷',
+            'php': '🐘',
+            'ruby': '💎',
+            'go': '🐹',
+            'rust': '🦀'
+        };
+        return icons[language] || '📝';
     }
     
     // Faire défiler vers le bas

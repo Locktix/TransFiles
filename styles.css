@@ -118,6 +118,45 @@ body {
     margin-bottom: 25px;
 }
 
+/* Sélection de langue */
+.language-selection {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #f7fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.language-selection label {
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.9rem;
+}
+
+.language-selection select {
+    padding: 8px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    background: white;
+    font-size: 0.9rem;
+    color: #4a5568;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+    min-width: 150px;
+}
+
+.language-selection select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.language-selection select:hover {
+    border-color: #cbd5e0;
+}
+
 .text-input-area textarea {
     width: 100%;
     height: 120px;
@@ -553,5 +592,80 @@ body {
     .footer-details {
         grid-template-columns: 1fr;
         gap: 15px;
+    }
+}
+
+/* === COLORATION SYNTAXIQUE === */
+.language-javascript {
+    color: #f7df1e;
+}
+
+.language-java {
+    color: #007396;
+}
+
+.language-python {
+    color: #3776ab;
+}
+
+.language-html {
+    color: #e34f26;
+}
+
+.language-css {
+    color: #1572b6;
+}
+
+.language-sql {
+    color: #336791;
+}
+
+.language-json {
+    color: #000000;
+}
+
+.language-xml {
+    color: #ff6600;
+}
+
+.language-bash {
+    color: #4eaa25;
+}
+
+.language-cpp {
+    color: #00599c;
+}
+
+.language-csharp {
+    color: #239120;
+}
+
+.language-php {
+    color: #777bb4;
+}
+
+.language-ruby {
+    color: #cc342d;
+}
+
+.language-go {
+    color: #00add8;
+}
+
+.language-rust {
+    color: #000000;
+}
+
+/* Responsive pour la sélection de langue */
+@media (max-width: 768px) {
+    .language-selection {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .language-selection select {
+        width: 100%;
+        min-width: auto;
     }
 }

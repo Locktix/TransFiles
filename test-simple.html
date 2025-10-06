@@ -23,6 +23,45 @@
             margin-bottom: 20px;
         }
         
+        /* Sélection de langue */
+        .language-selection {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .language-selection label {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+        
+        .language-selection select {
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            background: white;
+            font-size: 0.9rem;
+            color: #4a5568;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+            min-width: 150px;
+        }
+        
+        .language-selection select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .language-selection select:hover {
+            border-color: #cbd5e0;
+        }
+        
         /* Styles du footer */
         .footer {
             background: rgba(255, 255, 255, 0.95);
@@ -158,6 +197,27 @@
                 
                 <!-- Zone de texte -->
                 <div class="text-input-area">
+                    <div class="language-selection">
+                        <label for="languageSelect">Langue :</label>
+                        <select id="languageSelect">
+                            <option value="text">Texte</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="java">Java</option>
+                            <option value="python">Python</option>
+                            <option value="html">HTML</option>
+                            <option value="css">CSS</option>
+                            <option value="sql">SQL</option>
+                            <option value="json">JSON</option>
+                            <option value="xml">XML</option>
+                            <option value="bash">Bash/Shell</option>
+                            <option value="cpp">C++</option>
+                            <option value="csharp">C#</option>
+                            <option value="php">PHP</option>
+                            <option value="ruby">Ruby</option>
+                            <option value="go">Go</option>
+                            <option value="rust">Rust</option>
+                        </select>
+                    </div>
                     <textarea id="textInput" placeholder="Tapez votre texte ou code ici..."></textarea>
                     <button id="sendText">Envoyer le texte</button>
                 </div>
@@ -256,8 +316,9 @@
                 
                 document.getElementById('sendText').addEventListener('click', () => {
                     const text = document.getElementById('textInput').value.trim();
+                    const language = document.getElementById('languageSelect').value;
                     if (text) {
-                        this.simulateReceivedContent('text', text);
+                        this.simulateReceivedContent('text', text, language);
                         document.getElementById('textInput').value = '';
                         this.showNotification('Texte envoyé (simulation)', 'success');
                     } else {
@@ -337,7 +398,7 @@
                 document.getElementById('fileInput').value = '';
             }
             
-            simulateReceivedContent(type, content) {
+            simulateReceivedContent(type, content, language = 'text') {
                 const receivedContent = document.getElementById('receivedContent');
                 const emptyState = receivedContent.querySelector('.empty-state');
                 if (emptyState) {
@@ -350,13 +411,16 @@
                 const timestamp = new Date().toLocaleString('fr-FR');
                 
                 if (type === 'text') {
+                    const languageLabel = this.getLanguageLabel(language);
+                    const languageIcon = this.getLanguageIcon(language);
+                    
                     item.innerHTML = `
                         <div class="item-header">
-                            <span class="item-type">📝 Texte</span>
+                            <span class="item-type">${languageIcon} ${languageLabel}</span>
                             <span class="item-timestamp">${timestamp}</span>
                         </div>
                         <div class="item-content">
-                            <pre>${this.escapeHtml(content)}</pre>
+                            <pre class="language-${language}">${this.escapeHtml(content)}</pre>
                         </div>
                         <div class="item-actions">
                             <button class="action-btn copy" onclick="app.copyToClipboard('${this.escapeHtml(content)}')">
@@ -404,6 +468,52 @@
                 setTimeout(() => {
                     notification.classList.remove('show');
                 }, 3000);
+            }
+            
+            // Obtenir le label de la langue
+            getLanguageLabel(language) {
+                const labels = {
+                    'text': 'Texte',
+                    'javascript': 'JavaScript',
+                    'java': 'Java',
+                    'python': 'Python',
+                    'html': 'HTML',
+                    'css': 'CSS',
+                    'sql': 'SQL',
+                    'json': 'JSON',
+                    'xml': 'XML',
+                    'bash': 'Bash/Shell',
+                    'cpp': 'C++',
+                    'csharp': 'C#',
+                    'php': 'PHP',
+                    'ruby': 'Ruby',
+                    'go': 'Go',
+                    'rust': 'Rust'
+                };
+                return labels[language] || 'Texte';
+            }
+            
+            // Obtenir l'icône de la langue
+            getLanguageIcon(language) {
+                const icons = {
+                    'text': '📝',
+                    'javascript': '🟨',
+                    'java': '☕',
+                    'python': '🐍',
+                    'html': '🌐',
+                    'css': '🎨',
+                    'sql': '🗄️',
+                    'json': '📋',
+                    'xml': '📄',
+                    'bash': '💻',
+                    'cpp': '⚡',
+                    'csharp': '🔷',
+                    'php': '🐘',
+                    'ruby': '💎',
+                    'go': '🐹',
+                    'rust': '🦀'
+                };
+                return icons[language] || '📝';
             }
         }
         
