@@ -19,6 +19,7 @@
                 <input type="text" id="roomId" placeholder="Code de la room (ex: ABC123)" maxlength="10">
                 <button id="joinRoom">Rejoindre</button>
                 <button id="createRoom">Nouvelle Room</button>
+                <button id="showRooms">📋 Rooms</button>
             </div>
             <div class="room-status">
                 <span id="roomStatus">Non connecté</span>
@@ -91,6 +92,25 @@
         <!-- Zone de notification -->
         <div class="notification" id="notification"></div>
         
+        <!-- Modal de gestion des rooms -->
+        <div class="modal" id="roomsModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>📋 Gestion des Rooms</h2>
+                    <button class="modal-close" id="closeRoomsModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="rooms-list" id="roomsList">
+                        <div class="loading">Chargement des rooms...</div>
+                    </div>
+                    <div class="modal-actions">
+                        <button id="refreshRooms" class="action-btn">🔄 Actualiser</button>
+                        <button id="clearAllRooms" class="action-btn danger">🗑️ Tout supprimer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Footer -->
         <footer class="footer">
             <div class="footer-content">
@@ -100,7 +120,7 @@
                 </div>
                 <div class="footer-details">
                     <div class="version-info">
-                        <span class="version">v0.5</span>
+                        <span class="version">v0.6</span>
                         <span class="build">Build 2024.01</span>
                     </div>
                     <div class="author-info">

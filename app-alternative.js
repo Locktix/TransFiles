@@ -7,7 +7,15 @@ class TransFilesAppAlternative {
         this.roomIdInput = document.getElementById('roomId');
         this.joinRoomBtn = document.getElementById('joinRoom');
         this.createRoomBtn = document.getElementById('createRoom');
+        this.showRoomsBtn = document.getElementById('showRooms');
         this.roomStatus = document.getElementById('roomStatus');
+        
+        // Éléments de la modal
+        this.roomsModal = document.getElementById('roomsModal');
+        this.closeRoomsModal = document.getElementById('closeRoomsModal');
+        this.roomsList = document.getElementById('roomsList');
+        this.refreshRoomsBtn = document.getElementById('refreshRooms');
+        this.clearAllRoomsBtn = document.getElementById('clearAllRooms');
         
         this.textInput = document.getElementById('textInput');
         this.sendTextBtn = document.getElementById('sendText');
@@ -27,6 +35,7 @@ class TransFilesAppAlternative {
         this.currentRoom = null;
         this.currentFile = null;
         this.isConnected = false;
+        this.isSending = false; // Protection contre les envois multiples
         
         // Références Firebase (seulement pour la base de données)
         this.database = window.firebaseConfig.database;
@@ -45,16 +54,47 @@ class TransFilesAppAlternative {
     // Configuration des événements
     setupEventListeners() {
         // Gestion des rooms
-        this.joinRoomBtn.addEventListener('click', () => this.joinRoom());
-        this.createRoomBtn.addEventListener('click', () => this.createRoom());
+        this.joinRoomBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.joinRoom();
+        });
+        this.createRoomBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.createRoom();
+        });
+        this.showRoomsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.showRoomsModal();
+        });
         this.roomIdInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.joinRoom();
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.joinRoom();
+            }
+        });
+        
+        // Gestion de la modal des rooms
+        this.closeRoomsModal.addEventListener('click', () => this.hideRoomsModal());
+        this.refreshRoomsBtn.addEventListener('click', () => this.loadRooms());
+        this.clearAllRoomsBtn.addEventListener('click', () => this.clearAllRooms());
+        
+        // Fermer la modal en cliquant à l'extérieur
+        this.roomsModal.addEventListener('click', (e) => {
+            if (e.target === this.roomsModal) {
+                this.hideRoomsModal();
+            }
         });
         
         // Gestion du texte
-        this.sendTextBtn.addEventListener('click', () => this.sendText());
+        this.sendTextBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.sendText();
+        });
         this.textInput.addEventListener('keypress', (e) => {
-            if (e.ctrlKey && e.key === 'Enter') this.sendText();
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                this.sendText();
+            }
         });
         
         // Gestion des fichiers
@@ -118,6 +158,11 @@ class TransFilesAppAlternative {
     
     // Envoyer du texte
     sendText() {
+        // Protection contre les envois multiples
+        if (this.isSending) {
+            return;
+        }
+        
         const text = this.textInput.value.trim();
         
         if (!text) {
@@ -130,6 +175,8 @@ class TransFilesAppAlternative {
             return;
         }
         
+        this.isSending = true;
+        
         const textData = {
             type: 'text',
             content: text,
@@ -141,6 +188,11 @@ class TransFilesAppAlternative {
         this.saveToRoom(textData);
         this.textInput.value = '';
         this.showNotification('Texte envoyé !', 'success');
+        
+        // Réactiver l'envoi après un court délai
+        setTimeout(() => {
+            this.isSending = false;
+        }, 1000);
     }
     
     // === GESTION DES FICHIERS (VERSION ALTERNATIVE) ===
@@ -271,8 +323,9 @@ class TransFilesAppAlternative {
         }
         
         const item = this.createReceivedItem(data);
-        this.receivedContent.appendChild(item);
-        this.scrollToBottom();
+        // Insérer au début (en haut) pour avoir les plus récents en premier
+        this.receivedContent.insertBefore(item, this.receivedContent.firstChild);
+        this.scrollToTop();
     }
     
     // Mettre à jour le contenu reçu
@@ -281,14 +334,20 @@ class TransFilesAppAlternative {
         if (existingItem) {
             existingItem.remove();
         }
+        // Réafficher le contenu (sera inséré au bon endroit selon le timestamp)
         this.displayReceivedContent(data);
     }
     
     // Créer un élément reçu
     createReceivedItem(data) {
         const item = document.createElement('div');
-        item.className = `received-item ${data.type}`;
+        item.className = `received-item ${data.type} new-message`;
         item.setAttribute('data-key', data.timestamp);
+        
+        // Retirer la classe "new-message" après l'animation
+        setTimeout(() => {
+            item.classList.remove('new-message');
+        }, 500);
         
         const timestamp = new Date(data.timestamp).toLocaleString('fr-FR');
         
@@ -435,7 +494,12 @@ class TransFilesAppAlternative {
         return icons[language] || '📝';
     }
     
-    // Faire défiler vers le bas
+    // Faire défiler vers le haut (pour les nouveaux messages)
+    scrollToTop() {
+        this.receivedContent.scrollTop = 0;
+    }
+    
+    // Faire défiler vers le bas (pour l'ancien comportement si nécessaire)
     scrollToBottom() {
         this.receivedContent.scrollTop = this.receivedContent.scrollHeight;
     }
@@ -456,12 +520,139 @@ class TransFilesAppAlternative {
             this.notification.classList.remove('show');
         }, 3000);
     }
+    
+    // === GESTION DES ROOMS ===
+    
+    // Afficher la modal des rooms
+    showRoomsModal() {
+        this.roomsModal.classList.add('show');
+        this.loadRooms();
+    }
+    
+    // Masquer la modal des rooms
+    hideRoomsModal() {
+        this.roomsModal.classList.remove('show');
+    }
+    
+    // Charger la liste des rooms
+    async loadRooms() {
+        this.roomsList.innerHTML = '<div class="loading">Chargement des rooms...</div>';
+        
+        try {
+            const roomsRef = this.database.ref('rooms');
+            const snapshot = await roomsRef.once('value');
+            const rooms = snapshot.val();
+            
+            if (!rooms) {
+                this.roomsList.innerHTML = `
+                    <div class="empty-rooms">
+                        <span class="empty-icon">📭</span>
+                        <p>Aucune room disponible</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const roomsList = Object.keys(rooms).map(roomId => {
+                const roomData = rooms[roomId];
+                const messageCount = Object.keys(roomData).length;
+                const lastActivity = Math.max(...Object.values(roomData).map(msg => msg.timestamp || 0));
+                
+                return {
+                    id: roomId,
+                    messageCount,
+                    lastActivity: new Date(lastActivity).toLocaleString('fr-FR'),
+                    isActive: roomId === this.currentRoom
+                };
+            }).sort((a, b) => b.lastActivity - a.lastActivity);
+            
+            this.displayRoomsList(roomsList);
+            
+        } catch (error) {
+            console.error('Erreur lors du chargement des rooms:', error);
+            this.roomsList.innerHTML = `
+                <div class="empty-rooms">
+                    <span class="empty-icon">❌</span>
+                    <p>Erreur lors du chargement</p>
+                </div>
+            `;
+        }
+    }
+    
+    // Afficher la liste des rooms
+    displayRoomsList(rooms) {
+        if (rooms.length === 0) {
+            this.roomsList.innerHTML = `
+                <div class="empty-rooms">
+                    <span class="empty-icon">📭</span>
+                    <p>Aucune room disponible</p>
+                </div>
+            `;
+            return;
+        }
+        
+        this.roomsList.innerHTML = rooms.map(room => `
+            <div class="room-item ${room.isActive ? 'active' : ''}">
+                <div class="room-info">
+                    <div class="room-name">${room.id} ${room.isActive ? '(Actuelle)' : ''}</div>
+                    <div class="room-stats">
+                        ${room.messageCount} message(s) • Dernière activité: ${room.lastActivity}
+                    </div>
+                </div>
+                <div class="room-actions">
+                    ${!room.isActive ? `<button class="room-btn join" onclick="app.joinRoomFromList('${room.id}')">Rejoindre</button>` : ''}
+                    <button class="room-btn delete" onclick="app.deleteRoom('${room.id}')">Supprimer</button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    // Rejoindre une room depuis la liste
+    joinRoomFromList(roomId) {
+        this.roomIdInput.value = roomId;
+        this.joinRoom(roomId);
+        this.hideRoomsModal();
+    }
+    
+    // Supprimer une room
+    async deleteRoom(roomId) {
+        if (!confirm(`Êtes-vous sûr de vouloir supprimer la room "${roomId}" ?`)) {
+            return;
+        }
+        
+        try {
+            const roomRef = this.database.ref(`rooms/${roomId}`);
+            await roomRef.remove();
+            this.showNotification(`Room "${roomId}" supprimée`, 'success');
+            this.loadRooms();
+        } catch (error) {
+            console.error('Erreur lors de la suppression:', error);
+            this.showNotification('Erreur lors de la suppression', 'error');
+        }
+    }
+    
+    // Supprimer toutes les rooms
+    async clearAllRooms() {
+        if (!confirm('Êtes-vous sûr de vouloir supprimer TOUTES les rooms ? Cette action est irréversible.')) {
+            return;
+        }
+        
+        try {
+            const roomsRef = this.database.ref('rooms');
+            await roomsRef.remove();
+            this.showNotification('Toutes les rooms ont été supprimées', 'success');
+            this.loadRooms();
+        } catch (error) {
+            console.error('Erreur lors de la suppression:', error);
+            this.showNotification('Erreur lors de la suppression', 'error');
+        }
+    }
 }
 
 // Fonction pour afficher les informations "À propos"
 function showAbout() {
     const aboutInfo = `
-📁 TransFiles v1.0.0
+📁 TransFiles v0.6
 
 🎯 Objectif :
 Application web pour le partage de fichiers et texte en temps réel entre étudiants.
