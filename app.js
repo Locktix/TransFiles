@@ -196,23 +196,66 @@ class TransFilesApp {
         try {
             this.showNotification('Upload en cours...', 'info');
             
-            // Upload vers Firebase Storage
-            const storageRef = this.storage.ref(`rooms/${this.currentRoom}/${Date.now()}_${this.currentFile.name}`);
-            const uploadTask = await storageRef.put(this.currentFile);
-            const downloadURL = await uploadTask.ref.getDownloadURL();
+            // Vérifier la taille du fichier (limite 10MB)
+            const maxSize = 10 * 1024 * 1024;
+            if (this.currentFile.size > maxSize) {
+                this.showNotification('Fichier trop volumineux (max 10MB)', 'error');
+                return;
+            }
             
-            const fileData = {
-                type: 'file',
-                name: this.currentFile.name,
-                size: this.currentFile.size,
-                url: downloadURL,
-                timestamp: Date.now(),
-                sender: 'Vous'
+            // Upload vers Firebase Storage avec gestion d'erreurs améliorée
+            const fileName = `${Date.now()}_${this.currentFile.name}`;
+            const storageRef = this.storage.ref(`rooms/${this.currentRoom}/${fileName}`);
+            
+            // Configuration de l'upload avec métadonnées
+            const metadata = {
+                contentType: this.currentFile.type,
+                customMetadata: {
+                    originalName: this.currentFile.name,
+                    roomId: this.currentRoom
+                }
             };
             
-            this.saveToRoom(fileData);
-            this.resetFileSelection();
-            this.showNotification('Fichier envoyé !', 'success');
+            const uploadTask = storageRef.put(this.currentFile, metadata);
+            
+            // Suivi du progrès
+            uploadTask.on('state_changed', 
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    this.showNotification(`Upload: ${Math.round(progress)}%`, 'info');
+                },
+                (error) => {
+                    console.error('Erreur upload:', error);
+                    if (error.code === 'storage/unauthorized') {
+                        this.showNotification('Erreur d\'autorisation. Vérifiez les règles Firebase Storage.', 'error');
+                    } else if (error.code === 'storage/canceled') {
+                        this.showNotification('Upload annulé', 'error');
+                    } else {
+                        this.showNotification(`Erreur upload: ${error.message}`, 'error');
+                    }
+                },
+                async () => {
+                    try {
+                        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                        
+                        const fileData = {
+                            type: 'file',
+                            name: this.currentFile.name,
+                            size: this.currentFile.size,
+                            url: downloadURL,
+                            timestamp: Date.now(),
+                            sender: 'Vous'
+                        };
+                        
+                        this.saveToRoom(fileData);
+                        this.resetFileSelection();
+                        this.showNotification('Fichier envoyé !', 'success');
+                    } catch (urlError) {
+                        console.error('Erreur récupération URL:', urlError);
+                        this.showNotification('Erreur lors de la récupération du lien', 'error');
+                    }
+                }
+            );
             
         } catch (error) {
             console.error('Erreur upload:', error);
