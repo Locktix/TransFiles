@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TransFiles - Test Simple</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .test-banner {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        .test-info {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        /* Styles du footer */
+        .footer {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            margin-top: 30px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border-top: 3px solid #667eea;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-info h3 {
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .footer-info p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .footer-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .version-info, .author-info, .tech-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .version-info span, .author-info span, .tech-info span {
+            display: block;
+            font-size: 0.85rem;
+            color: #4a5568;
+        }
+        
+        .version {
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .author {
+            font-weight: 600;
+            color: #48bb78;
+        }
+        
+        .tech {
+            color: #ed8936;
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 15px;
+            text-align: center;
+        }
+        
+        .footer-bottom p {
+            color: #718096;
+            font-size: 0.85rem;
+            margin: 0;
+        }
+        
+        .footer-bottom a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .footer-bottom a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .footer-details {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Bannière de test -->
+        <div class="test-banner">
+            🧪 TEST SIMPLE - Version sans Firebase
+        </div>
+        
+        <!-- Info de test -->
+        <div class="test-info">
+            <h3>✅ Test de l'interface :</h3>
+            <ul>
+                <li>✅ <strong>Boutons</strong> : Tous fonctionnels</li>
+                <li>✅ <strong>Interface</strong> : Responsive et moderne</li>
+                <li>✅ <strong>Drag & Drop</strong> : Zone de fichier active</li>
+                <li>⚠️ <strong>Partage</strong> : Simulation locale uniquement</li>
+            </ul>
+        </div>
+
+        <!-- En-tête avec gestion des rooms -->
+        <header class="header">
+            <h1>📁 TransFiles (Test Simple)</h1>
+            <div class="room-controls">
+                <input type="text" id="roomId" placeholder="Code de la room (ex: ABC123)" maxlength="10">
+                <button id="joinRoom">Rejoindre</button>
+                <button id="createRoom">Nouvelle Room</button>
+            </div>
+            <div class="room-status">
+                <span id="roomStatus">Mode test - Interface OK</span>
+            </div>
+        </header>
+
+        <!-- Zone principale avec deux colonnes -->
+        <main class="main-content">
+            <!-- Zone d'envoi (gauche) -->
+            <section class="send-section">
+                <h2>📤 Envoyer</h2>
+                
+                <!-- Zone de texte -->
+                <div class="text-input-area">
+                    <textarea id="textInput" placeholder="Tapez votre texte ou code ici..."></textarea>
+                    <button id="sendText">Envoyer le texte</button>
+                </div>
+
+                <!-- Zone de fichier -->
+                <div class="file-input-area">
+                    <div class="file-drop-zone" id="fileDropZone">
+                        <div class="drop-content">
+                            <span class="drop-icon">📎</span>
+                            <p>Glissez-déposez un fichier ici</p>
+                            <p><small>(Test local uniquement)</small></p>
+                            <p>ou</p>
+                            <button id="fileInputBtn">Choisir un fichier</button>
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" style="display: none;">
+                    <div class="file-info" id="fileInfo" style="display: none;">
+                        <span id="fileName"></span>
+                        <button id="sendFile">Envoyer le fichier</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Zone de réception (droite) -->
+            <section class="receive-section">
+                <h2>📥 Recevoir</h2>
+                <div class="received-content" id="receivedContent">
+                    <div class="empty-state">
+                        <span class="empty-icon">📭</span>
+                        <p>En attente de contenu...</p>
+                        <p><small>Mode test - Simulation locale</small></p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Zone de notification -->
+        <div class="notification" id="notification"></div>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h3>📁 TransFiles</h3>
+                    <p>Partage de fichiers en temps réel</p>
+                </div>
+                <div class="footer-details">
+                    <div class="version-info">
+                        <span class="version">v1.0.0</span>
+                        <span class="build">Build 2024.01</span>
+                    </div>
+                    <div class="author-info">
+                        <span class="author">Développé par Alan P.</span>
+                        <span class="institution">HELMO - Étudiant</span>
+                    </div>
+                    <div class="tech-info">
+                        <span class="tech">HTML5 • CSS3 • JavaScript • Firebase</span>
+                        <span class="license">MIT License</span>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 TransFiles. Tous droits réservés. | 
+                   <a href="https://github.com/locktix/TransFiles" target="_blank">GitHub</a> | 
+                   <a href="#" onclick="showAbout()">À propos</a>
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Script de test simple -->
+    <script>
+        // Test simple sans Firebase
+        class TestApp {
+            constructor() {
+                this.setupEventListeners();
+                this.showNotification('Test simple activé - Interface fonctionnelle !', 'success');
+            }
+            
+            setupEventListeners() {
+                // Test des boutons
+                document.getElementById('createRoom').addEventListener('click', () => {
+                    const roomId = this.generateRoomId();
+                    document.getElementById('roomId').value = roomId;
+                    this.showNotification(`Room de test créée : ${roomId}`, 'success');
+                });
+                
+                document.getElementById('joinRoom').addEventListener('click', () => {
+                    const roomId = document.getElementById('roomId').value.trim();
+                    if (roomId) {
+                        this.showNotification(`Connexion à la room : ${roomId}`, 'info');
+                    } else {
+                        this.showNotification('Veuillez saisir un code de room', 'error');
+                    }
+                });
+                
+                document.getElementById('sendText').addEventListener('click', () => {
+                    const text = document.getElementById('textInput').value.trim();
+                    if (text) {
+                        this.simulateReceivedContent('text', text);
+                        document.getElementById('textInput').value = '';
+                        this.showNotification('Texte envoyé (simulation)', 'success');
+                    } else {
+                        this.showNotification('Veuillez saisir du texte', 'error');
+                    }
+                });
+                
+                // Test des fichiers
+                document.getElementById('fileInputBtn').addEventListener('click', () => {
+                    document.getElementById('fileInput').click();
+                });
+                
+                document.getElementById('fileInput').addEventListener('change', (e) => {
+                    if (e.target.files[0]) {
+                        this.handleFileSelect(e.target.files[0]);
+                    }
+                });
+                
+                document.getElementById('sendFile').addEventListener('click', () => {
+                    this.showNotification('Fichier envoyé (simulation)', 'success');
+                    this.resetFileSelection();
+                });
+                
+                // Test drag & drop
+                const dropZone = document.getElementById('fileDropZone');
+                dropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('drag-over');
+                });
+                
+                dropZone.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('drag-over');
+                });
+                
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('drag-over');
+                    if (e.dataTransfer.files[0]) {
+                        this.handleFileSelect(e.dataTransfer.files[0]);
+                    }
+                });
+                
+                dropZone.addEventListener('click', () => {
+                    document.getElementById('fileInput').click();
+                });
+            }
+            
+            generateRoomId() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let result = '';
+                for (let i = 0; i < 6; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
+            
+            handleFileSelect(file) {
+                if (!file) return;
+                
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                if (file.size > maxSize) {
+                    this.showNotification('Fichier trop volumineux (max 5MB)', 'error');
+                    return;
+                }
+                
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('fileInfo').style.display = 'flex';
+                document.getElementById('fileDropZone').style.display = 'none';
+                
+                this.showNotification(`Fichier sélectionné : ${file.name}`, 'info');
+            }
+            
+            resetFileSelection() {
+                document.getElementById('fileInfo').style.display = 'none';
+                document.getElementById('fileDropZone').style.display = 'block';
+                document.getElementById('fileInput').value = '';
+            }
+            
+            simulateReceivedContent(type, content) {
+                const receivedContent = document.getElementById('receivedContent');
+                const emptyState = receivedContent.querySelector('.empty-state');
+                if (emptyState) {
+                    emptyState.remove();
+                }
+                
+                const item = document.createElement('div');
+                item.className = `received-item ${type}`;
+                
+                const timestamp = new Date().toLocaleString('fr-FR');
+                
+                if (type === 'text') {
+                    item.innerHTML = `
+                        <div class="item-header">
+                            <span class="item-type">📝 Texte</span>
+                            <span class="item-timestamp">${timestamp}</span>
+                        </div>
+                        <div class="item-content">
+                            <pre>${this.escapeHtml(content)}</pre>
+                        </div>
+                        <div class="item-actions">
+                            <button class="action-btn copy" onclick="app.copyToClipboard('${this.escapeHtml(content)}')">
+                                📋 Copier
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                receivedContent.appendChild(item);
+                this.scrollToBottom();
+            }
+            
+            async copyToClipboard(text) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    this.showNotification('Copié dans le presse-papiers !', 'success');
+                } catch (error) {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    this.showNotification('Copié dans le presse-papiers !', 'success');
+                }
+            }
+            
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            scrollToBottom() {
+                const receivedContent = document.getElementById('receivedContent');
+                receivedContent.scrollTop = receivedContent.scrollHeight;
+            }
+            
+            showNotification(message, type = 'info') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = `notification ${type} show`;
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        }
+        
+        // Fonction pour afficher les informations "À propos"
+        function showAbout() {
+            const aboutInfo = `
+📁 TransFiles v1.0.0
+
+🎯 Objectif :
+Application web pour le partage de fichiers et texte en temps réel entre étudiants.
+
+✨ Fonctionnalités :
+• Partage de texte instantané
+• Upload de fichiers (drag & drop)
+• Système de rooms partagées
+• Interface responsive
+• Temps réel avec Firebase
+
+🛠️ Technologies :
+• HTML5, CSS3, JavaScript
+• Firebase Realtime Database
+• Firebase Storage (version alternative)
+• GitHub Pages
+
+👨‍💻 Développé par :
+Alan P. - Étudiant HELMO
+
+📄 Licence : MIT
+🔗 GitHub : https://github.com/locktix/TransFiles
+            `;
+            
+            alert(aboutInfo);
+        }
+        
+        // Initialiser l'application
+        document.addEventListener('DOMContentLoaded', () => {
+            window.app = new TestApp();
+        });
+    </script>
+</body>
+</html>

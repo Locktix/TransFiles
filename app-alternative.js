@@ -392,6 +392,37 @@ class TransFilesAppAlternative {
     }
 }
 
+// Fonction pour afficher les informations "À propos"
+function showAbout() {
+    const aboutInfo = `
+📁 TransFiles v1.0.0
+
+🎯 Objectif :
+Application web pour le partage de fichiers et texte en temps réel entre étudiants.
+
+✨ Fonctionnalités :
+• Partage de texte instantané
+• Upload de fichiers (drag & drop)
+• Système de rooms partagées
+• Interface responsive
+• Temps réel avec Firebase
+
+🛠️ Technologies :
+• HTML5, CSS3, JavaScript
+• Firebase Realtime Database
+• Firebase Storage (version alternative)
+• GitHub Pages
+
+👨‍💻 Développé par :
+Alan P. - Étudiant HELMO
+
+📄 Licence : MIT
+🔗 GitHub : https://github.com/locktix/TransFiles
+    `;
+    
+    alert(aboutInfo);
+}
+
 // Initialiser l'application quand le DOM est chargé
 document.addEventListener('DOMContentLoaded', () => {
     window.app = new TransFilesAppAlternative();
