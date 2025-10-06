@@ -1,0 +1,22 @@
+# Configuration pour GitHub Pages
+# Ce fichier permet de configurer Jekyll si nécessaire
+
+# Configuration de base
+title: TransFiles
+description: Partage de fichiers en temps réel
+author: Votre nom
+
+# Configuration Jekyll
+theme: minima
+plugins:
+  - jekyll-feed
+
+# Exclusions (fichiers à ne pas traiter par Jekyll)
+exclude:
+  - README.md
+  - .gitignore
+  - _config.yml
+
+# Inclusions
+include:
+  - .htaccess

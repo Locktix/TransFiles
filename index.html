@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TransFiles - Partage de fichiers en temps réel</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- En-tête avec gestion des rooms -->
+        <header class="header">
+            <h1>📁 TransFiles</h1>
+            <div class="room-controls">
+                <input type="text" id="roomId" placeholder="Code de la room (ex: ABC123)" maxlength="10">
+                <button id="joinRoom">Rejoindre</button>
+                <button id="createRoom">Nouvelle Room</button>
+            </div>
+            <div class="room-status">
+                <span id="roomStatus">Non connecté</span>
+            </div>
+        </header>
+
+        <!-- Zone principale avec deux colonnes -->
+        <main class="main-content">
+            <!-- Zone d'envoi (gauche) -->
+            <section class="send-section">
+                <h2>📤 Envoyer</h2>
+                
+                <!-- Zone de texte -->
+                <div class="text-input-area">
+                    <textarea id="textInput" placeholder="Tapez votre texte ou code ici..."></textarea>
+                    <button id="sendText">Envoyer le texte</button>
+                </div>
+
+                <!-- Zone de fichier -->
+                <div class="file-input-area">
+                    <div class="file-drop-zone" id="fileDropZone">
+                        <div class="drop-content">
+                            <span class="drop-icon">📎</span>
+                            <p>Glissez-déposez un fichier ici</p>
+                            <p>ou</p>
+                            <button id="fileInputBtn">Choisir un fichier</button>
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" style="display: none;">
+                    <div class="file-info" id="fileInfo" style="display: none;">
+                        <span id="fileName"></span>
+                        <button id="sendFile">Envoyer le fichier</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Zone de réception (droite) -->
+            <section class="receive-section">
+                <h2>📥 Recevoir</h2>
+                <div class="received-content" id="receivedContent">
+                    <div class="empty-state">
+                        <span class="empty-icon">📭</span>
+                        <p>En attente de contenu...</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Zone de notification -->
+        <div class="notification" id="notification"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="firebase-config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
