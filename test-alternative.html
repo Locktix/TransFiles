@@ -3,25 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TransFiles - Partage de fichiers en temps réel</title>
+    <title>TransFiles - Test Version Alternative</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <style>
+        .test-banner {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        .test-info {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
+        <!-- Bannière de test -->
+        <div class="test-banner">
+            ✅ VERSION ALTERNATIVE ACTIVE - Pas de problème CORS !
+        </div>
+        
+        <!-- Info de test -->
+        <div class="test-info">
+            <h3>🧪 Test de la version alternative :</h3>
+            <ul>
+                <li>✅ <strong>Partage de texte</strong> : Fonctionne parfaitement</li>
+                <li>✅ <strong>Partage de fichiers</strong> : Via Base64 (limite 5MB)</li>
+                <li>✅ <strong>Temps réel</strong> : Synchronisation instantanée</li>
+                <li>✅ <strong>Pas de CORS</strong> : Aucun problème d'upload</li>
+            </ul>
+        </div>
+
         <!-- En-tête avec gestion des rooms -->
         <header class="header">
-            <h1>📁 TransFiles</h1>
+            <h1>📁 TransFiles (Version Alternative)</h1>
             <div class="room-controls">
                 <input type="text" id="roomId" placeholder="Code de la room (ex: ABC123)" maxlength="10">
                 <button id="joinRoom">Rejoindre</button>
                 <button id="createRoom">Nouvelle Room</button>
             </div>
             <div class="room-status">
-                <span id="roomStatus">Non connecté</span>
+                <span id="roomStatus">Version alternative - Prêt</span>
             </div>
         </header>
 
@@ -43,6 +73,7 @@
                         <div class="drop-content">
                             <span class="drop-icon">📎</span>
                             <p>Glissez-déposez un fichier ici</p>
+                            <p><small>(Limite 5MB - Version Base64)</small></p>
                             <p>ou</p>
                             <button id="fileInputBtn">Choisir un fichier</button>
                         </div>
@@ -62,6 +93,7 @@
                     <div class="empty-state">
                         <span class="empty-icon">📭</span>
                         <p>En attente de contenu...</p>
+                        <p><small>Version alternative - Base64</small></p>
                     </div>
                 </div>
             </section>
