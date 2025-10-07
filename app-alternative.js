@@ -222,10 +222,10 @@ class TransFilesAppAlternative {
     handleFileSelect(file) {
         if (!file) return;
         
-        // Vérifier la taille (limite de 5MB pour Base64)
-        const maxSize = 5 * 1024 * 1024; // 5MB
+        // Vérifier la taille (limite de 50MB pour Base64)
+        const maxSize = 50 * 1024 * 1024; // 50 MB
         if (file.size > maxSize) {
-            this.showNotification('Fichier trop volumineux (max 5MB pour cette méthode)', 'error');
+            this.showNotification('Fichier trop volumineux (max 50MB pour cette méthode)', 'error');
             return;
         }
         
@@ -662,7 +662,7 @@ class TransFilesAppAlternative {
 // Fonction pour afficher les informations "À propos"
 function showAbout() {
     const aboutInfo = `
-📁 TransFiles v0.6
+📁 TransFiles v0.7
 
 🎯 Objectif :
 Application web pour le partage de fichiers et texte en temps réel entre étudiants.
