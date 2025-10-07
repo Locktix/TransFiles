@@ -365,7 +365,7 @@ class TransFilesAppAlternative {
                     <pre class="language-${language}">${this.escapeHtml(data.content)}</pre>
                 </div>
                 <div class="item-actions">
-                    <button class="action-btn copy" onclick="app.copyToClipboard('${this.escapeHtml(data.content)}')">
+                    <button class="action-btn copy" data-copy-text="${this.escapeHtml(data.content)}">
                         📋 Copier
                     </button>
                 </div>
@@ -388,6 +388,16 @@ class TransFilesAppAlternative {
                     </button>
                 </div>
             `;
+        }
+        
+        // Ajouter l'event listener pour le bouton copier
+        const copyBtn = item.querySelector('.action-btn.copy');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const textToCopy = copyBtn.getAttribute('data-copy-text');
+                this.copyToClipboard(textToCopy);
+            });
         }
         
         return item;
