@@ -69,6 +69,16 @@ class TransFilesApp {
         
         // Clic sur la zone de drop
         this.fileDropZone.addEventListener('click', () => this.fileInput.click());
+        
+        // Gestionnaire pour les boutons de copie (délégation d'événements)
+        this.receivedContent.addEventListener('click', (e) => {
+            if (e.target.classList.contains('copy')) {
+                const copyText = e.target.getAttribute('data-copy-text');
+                if (copyText) {
+                    this.copyToClipboard(copyText);
+                }
+            }
+        });
     }
     
     // === GESTION DES ROOMS ===
@@ -312,6 +322,9 @@ class TransFilesApp {
         const timestamp = new Date(data.timestamp).toLocaleString('fr-FR');
         
         if (data.type === 'text') {
+            // Stocker le contenu original dans un attribut data pour éviter les problèmes d'échappement
+            item.setAttribute('data-content', data.content);
+            
             item.innerHTML = `
                 <div class="item-header">
                     <span class="item-type">📝 Texte</span>
@@ -321,7 +334,7 @@ class TransFilesApp {
                     <pre>${this.escapeHtml(data.content)}</pre>
                 </div>
                 <div class="item-actions">
-                    <button class="action-btn copy" onclick="app.copyToClipboard('${this.escapeHtml(data.content)}')">
+                    <button class="action-btn copy" data-copy-text="${this.escapeHtml(data.content)}">
                         📋 Copier
                     </button>
                 </div>
@@ -353,12 +366,14 @@ class TransFilesApp {
     // Copier dans le presse-papiers
     async copyToClipboard(text) {
         try {
-            await navigator.clipboard.writeText(text);
+            // Décoder le HTML échappé si nécessaire
+            const decodedText = this.decodeHtmlEntities(text);
+            await navigator.clipboard.writeText(decodedText);
             this.showNotification('Copié dans le presse-papiers !', 'success');
         } catch (error) {
             // Fallback pour les navigateurs plus anciens
             const textArea = document.createElement('textarea');
-            textArea.value = text;
+            textArea.value = this.decodeHtmlEntities(text);
             document.body.appendChild(textArea);
             textArea.select();
             document.execCommand('copy');
@@ -372,6 +387,13 @@ class TransFilesApp {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+    
+    // Décoder les entités HTML
+    decodeHtmlEntities(text) {
+        const textarea = document.createElement('textarea');
+        textarea.innerHTML = text;
+        return textarea.value;
     }
     
     // Formater la taille de fichier

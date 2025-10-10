@@ -662,7 +662,7 @@ class TransFilesAppAlternative {
 // Fonction pour afficher les informations "À propos"
 function showAbout() {
     const aboutInfo = `
-📁 TransFiles v0.7
+📁 TransFiles V0.8
 
 🎯 Objectif :
 Application web pour le partage de fichiers et texte en temps réel entre étudiants.
