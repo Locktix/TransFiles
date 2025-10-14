@@ -334,7 +334,7 @@ class TransFilesApp {
                     <pre>${this.escapeHtml(data.content)}</pre>
                 </div>
                 <div class="item-actions">
-                    <button class="action-btn copy" data-copy-text="${this.escapeHtml(data.content)}">
+                    <button class="action-btn copy" data-copy-text="${this.escapeAttribute(data.content)}">
                         📋 Copier
                     </button>
                 </div>
@@ -387,6 +387,17 @@ class TransFilesApp {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+    
+    // Échapper le texte pour un attribut HTML (inclut les guillemets)
+    escapeAttribute(text) {
+        if (text == null) return '';
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
     }
     
     // Décoder les entités HTML
